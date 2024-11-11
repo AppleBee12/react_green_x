@@ -17,7 +17,7 @@ function App() {
         //유저정보가 있다면
         setIsLoggedIn(true);
         setUserobj(user.uid);
-       // console.log(user);
+        console.log(user.uid);
       } else {
         //유저정보가 없다면
         setIsLoggedIn(false);
