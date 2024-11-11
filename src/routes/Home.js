@@ -7,19 +7,19 @@ import Comment from"../components/Comment";
 import {
   addDoc,
   collection,
-  updateDoc,
   serverTimestamp,
   query,
-  where,
   getDocs,
+  orderBy,
+  limit
 } from "firebase/firestore";
 
-const Home = () => {
+const Home = ({userObj}) => {
   const [comment, setComment] = useState(""); //입력하는 글 정보
   const [comments, setComments] = useState([]); // 조회된 글 배열
 
   const getComments = async () => {
-    const q = query(collection(db, "comments"));
+    const q = query(collection(db, "comments"), orderBy("date", "desc"), limit(5));
 
     const querySnapshot = await getDocs(q);
     /*
@@ -38,7 +38,7 @@ const Home = () => {
    setComments(commentArr);
 
   };
-  console.log(comments);
+  //console.log(comments);
   useEffect (()=>{
     getComments();
   },[]) //최초 렌더링 후 실행, 변동시 실행
@@ -61,6 +61,7 @@ const Home = () => {
         //comments = firebase컬렉션 이름
         comment: comment,
         date: serverTimestamp(),
+        uid: userObj
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -84,7 +85,7 @@ const Home = () => {
       <hr/>
         <ListGroup>
           {comments.map(item=> 
-            <Comment commentObj={item}/>
+            <Comment key={item.id} commentObj={item} isOwner={item.uid === userObj}/>
             )}          
         </ListGroup>
 
