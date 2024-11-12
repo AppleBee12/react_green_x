@@ -5,10 +5,10 @@ import ListGroup from "react-bootstrap/ListGroup";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, orderBy, limit } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, limit, where } from "firebase/firestore";
 import{authService} from '../firebase';
 import Comment from "../components/Comment";
-console.log(authService);
+//console.log(authService);
 
 const Profile = () => {
   //console.log(userObj);
@@ -19,26 +19,17 @@ const Profile = () => {
   const [comments, setComments] = useState([]); // 조회된 글 배열
   const navigate = useNavigate();
 
-  const getComments = async () => {
-    
-    const q = query(collection(db, "comments"), where("uid", "==", "user.uid")), orderBy("date","desc"), limit(5);
-    const querySnapshot = await getDocs(q);
-    const commentArr = querySnapshot.docs.map(o)
-    
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      const commentObj = {
-        ...doc.data(),
-        id:doc.id
-        }
-        setComments((prev=>[commentObj, ...prev]));
-       
-    });
-    */
-    //const commentArr = querySnapshot.docs.map(doc=>{return{...doc.data(), id:doc.id}})
-    
-  };
 
+  const getComments = async ()=>{
+    const q = query(collection(db, "comments"), where("uid", "==", user.uid), orderBy("date", "desc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    const commentArr = querySnapshot.docs.map(doc=>({...doc.data(), id:doc.id}))
+    setComments(commentArr);
+  }
+
+  useEffect(()=>{
+    getComments();
+  },[]) //최소 렌더링후 실행, 변동시 실행
 
 
   const onLogOutClick = () => {
@@ -94,7 +85,7 @@ const Profile = () => {
       <h3>My Comment List</h3>
 
       <ListGroup>
-            {comment.map(item => 
+            {comments.map(item => 
               <Comment key={item.id} commentObj={item} isOwner={true} />
             )}
       </ListGroup>
