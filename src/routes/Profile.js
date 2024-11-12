@@ -1,6 +1,7 @@
 import React from "react";
 import { getAuth, signOut } from "firebase/auth";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -21,7 +22,13 @@ const Profile = () => {
   return (
     <div className="container">
       <h1>Profile Page</h1>
-      <Button variant="secondary" onClick={onLogOutClick}>로그아웃</Button>
+      <div className="profile">
+        <img src={`${process.env.PUBLIC_URL}/profile_icon.svg`} alt="" />
+      </div>
+          <input type="file" classNmae="hidden" accept="image/*" name="profile" id="profile" />
+          <Button variant="primary" type="button">프로필 이미지 변경</Button>
+          <hr/>
+      <Button variant="primary"onClick={onLogOutClick}>로그아웃</Button>
     </div>
   );
 };
