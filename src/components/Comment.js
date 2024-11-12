@@ -4,20 +4,36 @@ import Button from "react-bootstrap/Button";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import Form from "react-bootstrap/Form";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 const Comment = ({ commentObj, isOwner }) => {
   const [edit, setEdit] = useState(false);
   const [comment, setComment] = useState(commentObj.comment);
 
   const deleteComment = async () => {
+    const storage = getStorage();
     const deleteConfirm = window.confirm("정말 삭제할까요?");
-    if (deleteConfirm) await deleteDoc(doc(db, "comments"), commentObj.id);
-  };
+    if (deleteConfirm){
+      await deleteDoc(doc(db, "comments", commentObj.id));
+      
+      // Create a reference to the file to delete
+        const storageRef = ref(storage, commentObj.image);
+        console.log(storageRef);
+      // Delete the file
+      deleteObject(storageRef);
+    }
+  }
+
+
   const toggleEditMode = () => {
-    setEdit((prev) => !prev);
+    setEdit(prev => !prev);
   };
 
-  const onChange = (e) => {};
+  const onChange = (e) => {
+        // let value = e.target.value;
+        const {target:{value}} = e;
+        setComment(value);
+  };
   const onSubmit = async (e) => {
     e.preventDefault();
     const commentRef = doc(db, "comments", "CommentObj.id");
